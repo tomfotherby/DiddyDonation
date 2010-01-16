@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Diddy Donation - logged in{% endblock %}
+
+{% block content %}
+
+<div id="intro">
+<h3 style="margin-top:0;" class="good">Welcome, {{user.nickname}}</h3>
+
+</div>
+
+<h2>How to use this website</h2>
+
+<h3>1) Install the bookmarklet</h3>
+<p>
+Drag this link to your bookmarks toolbar: <a href="{{bookmarklet}}" title="Diddy Donate" alt="Diddy Donate" style="text-decoration:underline;">Diddy Donate</a>
+</p>
+
+<h3>2) Use the bookmarklet to pledge 1p to any webpage</h3>
+<p>
+When you visit a website that has something interesting, useful or fun and wish to show your appreciation, click the <img src="/static/bookmarklet.gif" /> bookmarklet in your toolbar to pledge a 1p tip.
+</p>
+
+<h3>3) Check back often</h3>
+<p>
+To see how many people are diddy-donating at sites around the web, and to see which sites you've donated to.
+Tell your friends to visit <a href="{{request.uri}}">{{request.host}}</a>, and start diddy-donating!
+</p>
+
+{% endblock %}

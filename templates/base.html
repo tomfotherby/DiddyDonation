@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <link type="text/css" rel="stylesheet" href="/static/screen.css" />
+  </head>
+
+  <body>
+
+    <div id="wrap">
+
+    {% if error_msg %}
+    <div id="error">
+      {{ error_msg }}
+    </div>
+    {% endif %}
+
+    <div id="header">
+        <div id="lip" style="font-size:smaller;">
+            {% if user %}
+            <a href="/home">bookmarklet</a>
+            <a href="/voter?openid={{lip.openid|urlencode}}">profile</a>
+            <a href="{{ logout_url }}">logout</a>
+            {% else %}
+            <a href="{{ login_url }}">login</a>
+            {% endif %}
+        </div>
+
+        <a href="/"><img id="logo" src="/static/logo.jpg"  /></a>
+
+        <div id="moto">
+            <h1 style="margin-bottom:0;"><a href="/" style="text-decoration:none;">Diddy Donation</a></h1>
+            <p>
+            Online Micro Donation service
+            </p>
+        </div>
+
+        <div style="clear:both;"></div>
+    </div>
+
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+
+    <div id="footer" class="subtle smaller">
+        <a href="/faq">FAQ</a>
+        <a href="/about">About</a>
+        <a href="/seed">Seed site with initial data</a>
+    </div>
+
+    </div>
+
+  </body>
+
+</html>

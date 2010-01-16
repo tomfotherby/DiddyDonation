@@ -1,0 +1,61 @@
+* {}
+
+body {font-family:helvetica,sans-serif;;padding:1em;}
+hr {}
+a {color:#000;}
+a:hover {text-decoration:underline;}
+a:visited {color:#000;}
+
+
+#bookmarklet {
+  width: 15em;
+  padding:.5em;
+  margin-right:0;
+  margin-top:2em;
+  border: 1px solid #000;
+}
+
+#wrap {
+  margin: 0 auto;
+  width:600px;
+}
+#logo {float:left;width:100px;border:none;}
+#moto {float:left;margin-left:20px;}
+
+#intro {
+margin-bottom:20px;
+}
+
+#content {margin-left:.5em;}
+#error {color:red; font-size:1.8em;font-weight:bold;}
+#lip {float:right;}
+#openid_identifier {width:20em;}
+#header {  border: 4px solid #89605a;padding:10px;margin-bottom:20px;}
+#header a {color:#000;}
+#goback {margin-bottom:1em;}
+#footer {margin-top:2em;}
+#footer a {color:#999;}
+
+.column {float:left;overflow:hidden;}
+.subtle, a.subtle {color:#999;}
+.smaller {font-size:.8em;}
+.larger {font-size:1.5em;}
+.good, a.good {color:green;}
+.bold, a.bold {font-weight:bold;}
+.bad {color:#a00;}
+.item {margin-bottom:.5em;}
+.title {font-size:2em;font-weight:bold;}
+.smalltitle {font-size:1em;}
+.inverted_button, .inverted_button:visited {background-color:#000;color:#fff;text-decoration:none;padding:2px;}
+.bookmarklet {border:none;}
+.website_item {font-size:1.8em;}
+.website_votes {color:#444;}
+.person_vote_item {font-size:1.4em;padding-bottom:10px;}
+
+.top_vote {font-size:1.8em;margin-bottom:5px;}
+.top_domain {font-size:1.8em;padding-left:10px;}
+.top_domain a {}
+.top_domain a:hover {text-decoration:underline;}
+
+.vcol {margin-right:10px;float:left;}
+.vcolitem {margin-bottom:10px;}
