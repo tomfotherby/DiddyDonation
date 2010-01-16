@@ -13,14 +13,29 @@
         </span>
     </div>
 
+    <div id="top_websites" class="column">
+        <h2>Webpage Donations</h2>
+        {% for campaign in campaigns %}
+            <!--<b>{{ campaign.beneficiary.nickname }}</b>-->
+            <a href="{{ campaign.link }}">{{ campaign.name }}</a>
+            {{ campaign.count }}p
+            <a href="/donate?key={{ campaign.key }}">pledge 1p</a>
+            <br/>
+        {% endfor %}
 
-    <h2>Webpages that have received donations</h2>
-    {% for campaign in campaigns %}
-        <!--<b>{{ campaign.beneficiary.nickname }}</b>-->
-        <a href="{{ campaign.link }}">{{ campaign.name }}</a>
-        {{ campaign.count }}p
-        <a href="/donate?key={{ campaign.key }}">pledge 1p</a>
-        <br/>
-    {% endfor %}
+    </div>
 
+    <div class="column" style="float:right;">
+
+        <h4 style="margin-bottom:4px;">Diddy-donate a website</h4>
+        <form action="/donate" method="post">
+          <input type="text" name="url" value="http://" />
+          <input type="submit" value="Donate" />
+        </form>
+
+
+    </div>
+
+
+    <div style="clear:both;"></div>
 {% endblock %}

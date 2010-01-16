@@ -18,7 +18,7 @@
         <div id="lip" style="font-size:smaller;">
             {% if user %}
             <a href="/home">bookmarklet</a>
-            <a href="/voter?openid={{lip.openid|urlencode}}">profile</a>
+            <a href="/profile?userid={{userid}}">profile</a>
             <a href="{{ logout_url }}">logout</a>
             {% else %}
             <a href="{{ login_url }}">login</a>
