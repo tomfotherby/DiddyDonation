@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Page{% endblock %}
+
+{% block content %}
+
+<div id="intro">
+<h3 style="margin-top:0;" class="good">Donations made by {{user.nickname}}</h3>
+</div>
+
+
+{% if donations %}
+
+
+<div class="column" style="margin-right:30px;">
+  {% for d in donations %}
+  <div class="person_vote_item">
+  <a href="{{ d.campaign.link }}">{{ d.campaign.link|escape }}</a>
+  </div>
+  {% endfor %}
+</div>
+
+<div style="clear:both;"></div>
+
+
+{% else %}
+No donations yet
+{% endif %}
+
+
+{% endblock %}
