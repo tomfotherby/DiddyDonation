@@ -2,21 +2,18 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     <link type="text/css" rel="stylesheet" href="/static/screen.css" />
+    <link rel="shortcut icon" href="/static/favicon.ico">
   </head>
 
   <body>
 
     <div id="wrap">
 
-    {% if info_msg %}
-        <div id="{{ msg_type }}">{{ info_msg }}</div>
-    {% endif %}
-
     <div id="header">
         <div id="lip" style="font-size:smaller;">
-            {% if user %}
+            {% if lip %}
             <a href="/home">bookmarklet</a>
-            <a href="/profile?userid={{userid}}">profile</a>
+            <a href="/profile?id={{lip.hashedkey}}">profile</a>
             <a href="{{ logout_url }}">logout</a>
             {% else %}
             <a href="{{ login_url }}">login</a>
@@ -36,13 +33,17 @@
     </div>
 
     <div id="content">
+
+      {% if error_msg %}
+        <div id="error">{{ error_msg }}</div>
+      {% endif %}
+
       {% block content %}{% endblock %}
     </div>
 
     <div id="footer" class="subtle smaller">
         <a href="/faq">FAQ</a>
         <a href="/about">About</a>
-        <a href="/seed">Seed site with initial data</a>
     </div>
 
     </div>

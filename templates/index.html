@@ -6,35 +6,35 @@
 
     <div id="intro" class="larger">
         <span>
-        Give a 1p donation to any webpage that you find interesting, useful or fun.
+        Give a one penny donation to any webpage that you find interesting, useful or fun.
         {% if not user %}
          <a href="{{ login_url }}" style="text-decoration:underline;" class="good">Login to get started &rarr;</a>
         {% endif %}
         </span>
     </div>
 
-    <div id="top_websites" class="column">
-        <h2>Webpage Donations</h2>
-        {% for campaign in campaigns %}
-            <!--<b>{{ campaign.beneficiary.nickname }}</b>-->
-            <a href="{{ campaign.link }}">{{ campaign.name }}</a>
-            {{ campaign.count }}p
-            <a href="/donate?link={{ campaign.link }}">pledge 1p</a>
-            <br/>
-        {% endfor %}
-
-    </div>
 
     <div class="column" style="float:right;">
 
-        <h4 style="margin-bottom:4px;">Diddy-donate a website</h4>
+        <h4 style="margin-bottom:4px;">Diddydonate a webpage</h4>
         <form action="/donate" method="get">
           <input type="text" name="link" value="http://" />
           <input type="submit" value="Donate" />
         </form>
-
-
     </div>
+
+    <div id="top_websites" class="column">
+        <h2>Latest Donations</h2>
+        {% for campaign in campaigns %}
+            <div style="padding: 3px 0;">
+            <span class="amount">{{ campaign.count }}p</span>
+            <a title="pledge 1p to this webpage" href="/donate?link={{ campaign.link }}"><img src="static/icons/coins_add.png" /></a>
+            {{ campaign.link|urlizetrunc:40 }}
+            </div>
+        {% endfor %}
+    </div>
+
+
 
 
     <div style="clear:both;"></div>

@@ -4,27 +4,39 @@
 
 {% block content %}
 
-<div id="intro">
-<h3 style="margin-top:0;" class="good">Donations made by {{user.nickname}}</h3>
-</div>
+<span class="title">{{ user.nickname }}</span>
 
+<p>
+<span>Total pledged: <strong>{{pledged}}p</strong>.</span>
 
-{% if donations %}
+{% ifnotequal pledged 0 %}
+{% if not show_payment %}
+We will give you payment options when your pledges add up to a non-loss sum (<em>you have a way to go yet...</em>).
+{% endif %}
+{% endifnotequal %}
 
+<h3>Your pledges:</h3>
+
+{% if donations|length %}
 
 <div class="column" style="margin-right:30px;">
   {% for d in donations %}
-  <div class="person_vote_item">
-  <a href="{{ d.campaign.link }}">{{ d.campaign.link|escape }}</a>
-  </div>
+    <div style="padding: 3px 0;">
+    <span class="amount">{{ d.date_list|length }}p</span>
+    <a href="/donate?link={{ d.campaign.link }}" title="Pledge another 1p" ><img src="static/icons/coins_add.png" /></a>
+    <a href="/undonate?link={{ d.campaign.link}}" title="Remove" onclick="return confirm('Delete all pledges to this webpage?');"><img src="static/icons/coins_delete.png" /></a>
+    {{ d.campaign.link|urlizetrunc:60 }}
+    </div>
   {% endfor %}
 </div>
 
 <div style="clear:both;"></div>
-
+<div style="margin-top:20px">
+<span>Total pledged: <strong>{{pledged}}p</strong>.</span>
+</div>
 
 {% else %}
-No donations yet
+No donations yet. <a href="/home">See how to use this site</a>.
 {% endif %}
 
 

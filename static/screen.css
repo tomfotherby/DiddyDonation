@@ -1,6 +1,6 @@
 * {}
 
-body {font-family:helvetica,sans-serif;;padding:1em;}
+body {font-family:helvetica,sans-serif;padding:1em;}
 hr {}
 a {color:#000;}
 a:hover {text-decoration:underline;}
@@ -28,8 +28,6 @@ margin-bottom:20px;
 
 #content {margin-left:.5em;}
 #error {color:red; font-size:1.8em;font-weight:bold;}
-#info {color:orange; font-size:1.8em;font-weight:bold;}
-#success {color:green; font-size:1.8em;font-weight:bold;}
 #lip {float:right;}
 #openid_identifier {width:20em;}
 #header {  border: 4px solid #89605a;padding:10px;margin-bottom:20px;}
@@ -37,6 +35,10 @@ margin-bottom:20px;
 #goback {margin-bottom:1em;}
 #footer {margin-top:2em;}
 #footer a {color:#999;}
+
+.amount {background-color: #89605a;color:white;padding:2px;border: 1px solid #000; text-shadow:1px 1px 1px black; border-radius: 10px;-moz-border-radius: 10px;-webkit-border-radius: 10px}
+.pledge {padding-left: 18px;background:url("icons/coins_add.png") no-repeat center left;}
+.question {font: italic 1em Georgia, Times, serif;color: #777}
 
 .column {float:left;overflow:hidden;}
 .subtle, a.subtle {color:#999;}
