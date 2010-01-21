@@ -8,10 +8,8 @@
 
     <div id="wrap">
 
-    {% if error_msg %}
-    <div id="error">
-      {{ error_msg }}
-    </div>
+    {% if info_msg %}
+        <div id="{{ msg_type }}">{{ info_msg }}</div>
     {% endif %}
 
     <div id="header">

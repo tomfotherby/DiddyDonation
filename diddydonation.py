@@ -5,6 +5,7 @@ import Cookie
 import logging
 
 from google.appengine.api import users
+
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
@@ -16,15 +17,15 @@ _DEBUG = False
 ############## Models ###################
 
 class Campaign(db.Model):
-    beneficiary = db.UserProperty()
-    name        = db.StringProperty()
     link        = db.LinkProperty(required=True)
-    count       = db.IntegerProperty(required=True, default=0)
+    name        = db.StringProperty()
+    beneficiary = db.UserProperty()
     date        = db.DateTimeProperty(auto_now_add=True)
+    count       = db.IntegerProperty(required=True, default=0)
 
 class PennyDonation(db.Model):
+    campaign = db.ReferenceProperty(Campaign,required=True)
     donator  = db.UserProperty(required=True)
-    campaign = db.ReferenceProperty(Campaign)
     date     = db.DateTimeProperty(auto_now_add=True)
 
 
@@ -125,54 +126,30 @@ class Donate(BaseHandler):
         if not users.get_current_user():
             self.redirect(users.create_login_url(self.request.uri))
         else:
-            donator = users.get_current_user()
-
-            campaign_key = db.Key(self.request.get('key'))
-
-            if campaign_key:
-                # Create new donation
-                donation = PennyDonation(donator=donator,campaign=campaign_key)
-                donation.put()
-
-                # Keep count of donations for this campaign
-                campaign = db.get(campaign_key);
-                campaign.count += 1;
-                campaign.put()
-                self.redirect('/')
-            else:
-                logging.error('Campaign key does not exist.')
-                self.show_main_page('An error occured.  Please try again.')
-
-    def post(self):
-
-        if not users.get_current_user():
-            self.redirect(users.create_login_url(self.request.uri))
-        else:
 
             donator = users.get_current_user()
 
-            url = self.request.get('url')
+            link = self.request.get('link')
 
-            campaign = Campaign.gql("WHERE link = :1", url)
+            campaign = Campaign.gql("WHERE link = :1", link)
             numFound = campaign.count()
 
             if numFound == 0:
                 # Create new Campaign
-                campaign = Campaign(name="todo-get-url-title",link=url, count=1)
+                campaign = Campaign(name="todo-get-url-title",link=link, count=1)
                 campaign.put()
                 # Create new donation
                 donation = PennyDonation(donator=donator,campaign=campaign)
                 donation.put()
                 self.redirect('/')
             elif numFound == 1:
-
+                c = campaign[0]
                 # Create new donation
-                donation = PennyDonation(donator=donator,campaign=campaign[0])
+                donation = PennyDonation(donator=donator,campaign=c)
                 donation.put()
                 # Keep count of donations for this campaign
-                campaign[0].count += 1;
-                campaign[0].put()
-
+                c.count += 1
+                c.put()
                 self.redirect('/')
             else:
                 logging.error('Found multiple Campaigns with the same url.')
