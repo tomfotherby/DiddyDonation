@@ -14,3 +14,9 @@ indexes:
   properties:
   - name: donator
   - name: date
+
+- kind: PennyDonation
+  properties:
+  - name: donator
+  - name: date
+    direction: desc

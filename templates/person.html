@@ -4,36 +4,58 @@
 
 {% block content %}
 
-<span class="title">{{ user.nickname }}</span>
+<span class="title">{{ lip.google_user.nickname }}</span>
+
+{% if undonelink %}
+<div class="infoBox flash" style="margin-top:10px">
+Your pledges were reduced by <span class='amount'>1p</span> for {{ undonelink|urlizetrunc:45 }}
+</div>
+{% endif %}
+{% if donatedlink %}
+<div class="infoBox success flash" style="margin-top:10px">
+You sucessfully pledged <span class='amount'>1p</span> to {{ donatedlink|urlizetrunc:45 }}
+</div>
+{% endif %}
+{% if deletedlink %}
+<div class="infoBox flash" style="margin-top:10px">
+All donations deleted for {{ deletedlink|urlizetrunc:45 }}
+</div>
+{% endif %}
+
+
 
 <p>
 <span>Total pledged: <strong>{{pledged}}p</strong>.</span>
 
 {% ifnotequal pledged 0 %}
-{% if not show_payment %}
-We will give you payment options when your pledges add up to a non-loss sum (<em>you have a way to go yet...</em>).
-{% endif %}
+Go to <a href="/checkout">checkout</a>.
 {% endifnotequal %}
 
-<h3>Your pledges:</h3>
+<h3>Your latest pledges:</h3>
 
 {% if donations|length %}
 
 <div class="column" style="margin-right:30px;">
   {% for d in donations %}
-    <div style="padding: 3px 0;">
-    <span class="amount">{{ d.date_list|length }}p</span>
-    <a href="/donate?link={{ d.campaign.link }}" title="Pledge another 1p" ><img src="static/icons/coins_add.png" /></a>
-    <a href="/undonate?link={{ d.campaign.link}}" title="Remove" onclick="return confirm('Delete all pledges to this webpage?');"><img src="static/icons/coins_delete.png" /></a>
-    {{ d.campaign.link|urlizetrunc:60 }}
+    <div style="padding: 4px 0 10px 0;">
+        <span class="amount">{{ d.date_list|length }}p</span>
+        <!--
+        <a href="/donate?link={{ d.campaign.link }}" title="Pledge another 1p" ><img src="static/icons/coins_add.png" /></a>
+        <a href="/delete?link={{ d.campaign.link}}" title="Remove" onclick="return confirm('Delete all pledges to this webpage?');"><img src="static/icons/coins_delete.png" /></a>
+        -->
+        {{ d.campaign.link|urlizetrunc:60 }}
+        <div style="padding: 2px 0 0 25px;">
+        <a href="/donate?link={{ d.campaign.link }}" title="Pledge another 1p" class="sexybutton"><span><span><span class="addonep">Pledge again</span></span></span></a>
+        {% if not d.date_list|length_is:1 %}
+            <a href="/undo?link={{ d.campaign.link }}" title="Remove 1p from Pledge" class="sexybutton"><span><span><span class="subtractonep">Undo</span></span></span></a>
+        {% endif %}
+        <a href="/delete?link={{ d.campaign.link}}" title="Delete pledges" class="sexybutton" onclick="return confirm('Delete all pledges to this webpage?');"><span><span><span class="delete">Delete</span></span></span></a>
+        </div>
     </div>
   {% endfor %}
 </div>
 
 <div style="clear:both;"></div>
-<div style="margin-top:20px">
-<span>Total pledged: <strong>{{pledged}}p</strong>.</span>
-</div>
 
 {% else %}
 No donations yet. <a href="/home">See how to use this site</a>.

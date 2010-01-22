@@ -6,30 +6,14 @@ a {color:#000;}
 a:hover {text-decoration:underline;}
 a:visited {color:#000;}
 
-
-#bookmarklet {
-  width: 15em;
-  padding:.5em;
-  margin-right:0;
-  margin-top:2em;
-  border: 1px solid #000;
-}
-
-#wrap {
-  margin: 0 auto;
-  width:600px;
-}
+#bookmarklet {width: 15em;padding:.5em;margin-right:0;margin-top:2em;border: 1px solid #000;}
+#wrap {margin: 0 auto;width:600px;}
 #logo {float:left;width:100px;border:none;}
 #moto {float:left;margin-left:20px;}
-
-#intro {
-margin-bottom:20px;
-}
-
+#intro {margin-bottom:20px;}
 #content {margin-left:.5em;}
 #error {color:red; font-size:1.8em;font-weight:bold;}
 #lip {float:right;}
-#openid_identifier {width:20em;}
 #header {  border: 4px solid #89605a;padding:10px;margin-bottom:20px;}
 #header a {color:#000;}
 #goback {margin-bottom:1em;}
@@ -37,8 +21,11 @@ margin-bottom:20px;
 #footer a {color:#999;}
 
 .amount {background-color: #89605a;color:white;padding:2px;border: 1px solid #000; text-shadow:1px 1px 1px black; border-radius: 10px;-moz-border-radius: 10px;-webkit-border-radius: 10px}
-.pledge {padding-left: 18px;background:url("icons/coins_add.png") no-repeat center left;}
 .question {font: italic 1em Georgia, Times, serif;color: #777}
+
+.infoBox {padding: 4px 18px;background:#FFFFCC url("images/icons/info.png") center left no-repeat;color:black;border:1px solid #DEDEDE}
+.success {background:#EEF4D4 url("images/icons/accept.png") center left no-repeat;color:#99A758;border:1px solid #E8EECA}
+.failure {background:#EEF4D4 url("images/icons/exclamation.png") center left no-repeat;color:#99A758;border:1px solid red}
 
 .column {float:left;overflow:hidden;}
 .subtle, a.subtle {color:#999;}
@@ -47,19 +34,27 @@ margin-bottom:20px;
 .good, a.good {color:green;}
 .bold, a.bold {font-weight:bold;}
 .bad {color:#a00;}
-.item {margin-bottom:.5em;}
 .title {font-size:2em;font-weight:bold;}
-.smalltitle {font-size:1em;}
-.inverted_button, .inverted_button:visited {background-color:#000;color:#fff;text-decoration:none;padding:2px;}
 .bookmarklet {border:none;}
-.website_item {font-size:1.8em;}
-.website_votes {color:#444;}
-.person_vote_item {font-size:1.4em;padding-bottom:10px;}
 
-.top_vote {font-size:1.8em;margin-bottom:5px;}
-.top_domain {font-size:1.8em;padding-left:10px;}
-.top_domain a {}
-.top_domain a:hover {text-decoration:underline;}
+.sexybutton {display: inline-block;margin: 0;padding: 0;font: bold 13px "Helvetica Neue", Helvetica, Arial, clean, sans-serif;text-decoration: none;text-shadow: 1px 1px 2px rgba(0,0,0,0.20);background: none;border: none;white-space: nowrap;cursor: pointer;user-select: none;-moz-user-select: none;_width: 0;overflow: visible;}
+.sexybutton span {display: block;height: 24px;padding-right: 12px;background-repeat: no-repeat;background-position: right top;}
+.sexybutton span span {padding-right: 0;padding-left: 12px;line-height: 24px;background-position: left top;}
+.sexybutton span span span {padding-left: 21px;background-image: none;background-repeat: no-repeat;background-position: left center;}
+.sexybutton span span span.after {padding-left: 0px;padding-right: 21px;background-position: right center;}
+.sexybutton:hover span {background-position: right center;}
+.sexybutton:hover span span {background-position: left center;}
+.sexybutton:active span {background-position: right bottom;}
+.sexybutton:active span span {background-position: left bottom;}
+.sexybutton:active span span span {background-position: left center;}
+.sexybutton:active span span span.after {background-position: right center;}
+.sexybutton img {margin-right: 5px;vertical-align: text-top;_margin-top: 4px;_vertical-align: text-bottom;}
+.sexybutton img.after {margin-right: 0;margin-left: 5px;}
+.sexybutton {color: #666;}
+.sexybutton:hover {color: #333;}
+.sexybutton span {background-image: url(images/buttons/button_right.gif);}
+.sexybutton span span {background-image: url(images/buttons/button_left.gif);}
+.sexybutton span.addonep      { background-image: url(images/icons/addonep.png); }
+.sexybutton span.subtractonep { background-image: url(images/icons/subtractonep.png); }
+.sexybutton span.delete       { background-image: url(images/icons/cross.png); }
 
-.vcol {margin-right:10px;float:left;}
-.vcolitem {margin-bottom:10px;}

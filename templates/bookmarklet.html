@@ -1,17 +1,19 @@
 <html>
 <head>
 <title>Diddydonate</title>
-<style type="text/css">
-* {font-family: helvetica, sans-serif;font-size:1.2em;}
-.smaller {font-size:.8em;}
-.subtle {color: #999;}
-</style>
 </head>
 
-<body onload="setTimeout('window.close()',2000)">
-{{msg}}
+<body onload="setTimeout('window.close()',5000)">
 
-<br/><br/><span style="font-size:.7em;color:#999;">window closing...</span>
+<div style="font-size:1.2em">
+{{msg}}
+</div>
+
+<p>
+If you are not <em>{{nickname}}</em>: <a href="/undo?link={{ link }}" title="Undo Pledge" >Undo Donation</a>
+<p>
+
+<span style="font-size:.7em;color:#999;">window closing...</span>
 </body>
 
 </html>

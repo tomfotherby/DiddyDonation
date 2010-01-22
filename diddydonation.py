@@ -17,27 +17,29 @@ _DEBUG = False
 
 ############## Models ###################
 
+# Table to store webpages and who should get money if someone donates to this page
 class Campaign(db.Model):
-    link        = db.LinkProperty(required=True)
-    beneficiary = db.UserProperty()
-    date        = db.DateTimeProperty(auto_now_add=True)
-    count       = db.IntegerProperty(required=True, default=0)
+    link         = db.LinkProperty(required=True)
+    beneficiary  = db.UserProperty()
+    created_date = db.DateTimeProperty(auto_now_add=True)
+    date         = db.DateTimeProperty(auto_now=True)
+    count        = db.IntegerProperty(required=True, default=0)
 
-class Person(db.Model):
-    donator   = db.UserProperty(required=True)
-    hashedkey = db.StringProperty()
+# Members table - hashedkey is used to avoid login when using bookmarklet
+class DiddyMember(db.Model):
+    google_user = db.UserProperty(required=True)
+    hashedkey   = db.StringProperty()
     def put(self):
+        # When stored - create hash of user_id - constant even if user changes email address
         if self.hashedkey is None:
-            if self.is_saved():
-                key = self.key()
-            else:
-                key = db.Model.put(self)
-        self.hashedkey = hashlib.sha1(str(key)).hexdigest()
+            self.hashedkey = hashlib.sha1(str(self.google_user.user_id())).hexdigest()
         assert self.hashedkey
         return db.Model.put(self)
 
+# Donations table
+# Note: multiple donations to the same webpage by the same user are stored in the same entity (via ListProperty)
 class PennyDonation(db.Model):
-    donator   = db.ReferenceProperty(Person,required=True)
+    donator   = db.ReferenceProperty(DiddyMember,required=True)
     campaign  = db.ReferenceProperty(Campaign,required=True)
     date_list = db.ListProperty(datetime.datetime)
     date      = db.DateTimeProperty(auto_now=True)
@@ -61,10 +63,10 @@ class BaseHandler(webapp.RequestHandler):
             return self.logged_in_person
         me = users.get_current_user()
         if me:
-            persons = Person.gql("WHERE donator = :1",me)
+            persons = DiddyMember.gql("WHERE google_user = :1",me)
             if persons.count() == 0:
-                # Save new Person to datastore (auto-generate a hash)
-                p = Person(donator=users.get_current_user())
+                # Save new DiddyMember to datastore (and auto-generate a hash)
+                p = DiddyMember(google_user=users.get_current_user())
                 p.put()
             elif persons.count() == 1:
                 p = persons[0]
@@ -76,17 +78,8 @@ class BaseHandler(webapp.RequestHandler):
 
     def render(self, template_name, extra_values={}):
 
-        lip = users.get_current_user()
-
-        if lip:
-            userid = lip.user_id()
-        else:
-            userid = None
-
         values = {
         'request': self.request,
-        'user': lip,
-        'userid': userid,
         'lip': self.get_or_create_logged_in_person(),
         'login_url': users.create_login_url('/home'),
         'logout_url': users.create_logout_url('http://%s/' % (self.request.host,)),
@@ -122,27 +115,24 @@ class HomePage(BaseHandler):
         else:
             self.redirect('/')
 
-class PersonPage(BaseHandler):
+class ProfilePage(BaseHandler):
     def get(self):
+        me = self.get_or_create_logged_in_person()
+        donations = PennyDonation.gql("WHERE donator = :1 ORDER BY date DESC", me)
+        donations = list(donations)
+        pledged = 0
+        for d in donations:
+            pledged += len(d.date_list)
 
-        hashed_key = self.request.get('id')
+        template_values = {
+            'donations':donations,
+            'pledged':pledged,
+            'undonelink':self.request.get('undone'),
+            'donatedlink':self.request.get('donated'),
+            'deletedlink':self.request.get('delete')}
 
-        persons = Person.gql("WHERE hashedkey = :1",hashed_key)
-        try:
-            p = persons[0]
-        except IndexError:
-            self.show_main_page('Unknown user')
-            return
+        self.render('person',template_values)
 
-        if p.donator.user_id() == users.get_current_user().user_id():
-            me = self.get_or_create_logged_in_person()
-            donations = PennyDonation.gql("WHERE donator = :1 ORDER BY date ASC", me)
-            donations = list(donations)
-            pledged = 0
-            for d in donations:
-                pledged += len(d.date_list)
-            show_payment = pledged >= 1000
-            self.render('person',{'donations':donations,'pledged':pledged,'show_payment':show_payment})
 
 class FAQPage(BaseHandler):
     def get(self):
@@ -152,7 +142,47 @@ class AboutPage(BaseHandler):
     def get(self):
         self.render('about',{})
 
+class CheckOutPage(BaseHandler):
+    def get(self):
+        self.render('checkout',{})
+
 class Donate(BaseHandler):
+    def do_donate(self, link, diddyMember):
+        campaign = Campaign.gql("WHERE link = :1", link)
+
+        if campaign.count() == 0:
+            # Create new Campaign
+            c = Campaign(link=link, count=1)
+            c.put()
+            # Create new donation
+            d = PennyDonation(donator=diddyMember,campaign=c)
+            d.date_list.append(datetime.datetime.now())
+            d.put()
+        elif campaign.count() == 1:
+            c = campaign[0]
+            prev_donation = PennyDonation.gql("WHERE campaign = :1 AND donator = :2",c,diddyMember)
+            if prev_donation.count() == 0:
+                # Create new donation
+                d = PennyDonation(donator=diddyMember,campaign=c)
+                d.date_list.append(datetime.datetime.now())
+                d.put()
+            elif prev_donation.count() == 1:
+                # Existing donation - update time to record donation
+                d = prev_donation[0]
+                d.date_list.append(datetime.datetime.now())
+                d.put()
+            else:
+                logging.error('Found multiple Donations with the same url and user.')
+                return False
+            # Keep count of donations for this campaign
+            c.count += 1
+            c.put()
+        else:
+            logging.error('Found multiple Campaigns with the same url.')
+            self.show_main_page('An error occured with your donation.')
+            return False
+        return True
+
     def get(self):
 
         link = self.request.get('link')
@@ -165,11 +195,11 @@ class Donate(BaseHandler):
 
         if from_bookmarklet:
             # Get person from hashedkey in the bookmarklet
-            donators = Person.gql("WHERE hashedkey = :1", self.request.get('k'))
+            donators = DiddyMember.gql("WHERE hashedkey = :1", self.request.get('k'))
             if donators.count() == 1:
                 me = donators[0]
             else:
-                logging.error('Found '+donators.count()+' People with hashedkey '+self.request.get('k'))
+                logging.error('Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
                 self.show_main_page('An error occured with your account.')
         else:
             if not users.get_current_user():
@@ -178,52 +208,31 @@ class Donate(BaseHandler):
             else:
                 me = self.get_or_create_logged_in_person()
 
-        campaign = Campaign.gql("WHERE link = :1", link)
-
-        if campaign.count() == 0:
-            # Create new Campaign
-            c = Campaign(link=link, count=1)
-            c.put()
-            # Create new donation
-            d = PennyDonation(donator=me,campaign=c)
-            d.date_list.append(datetime.datetime.now())
-            d.put()
+        if self.do_donate(link,me):
             if from_bookmarklet:
-                self.render('bookmarklet', {'msg':'Donation saved'})
+                self.render('bookmarklet', {'msg':'Donation saved','nickname':me.google_user.nickname(),'link':link})
             else:
-                self.redirect('profile?id='+me.hashedkey)
-        elif campaign.count() == 1:
-            c = campaign[0]
-
-            prev_donation = PennyDonation.gql("WHERE campaign = :1 AND donator = :2",c,me)
-
-            if prev_donation.count() == 0:
-                # Create new donation
-                d = PennyDonation(donator=me,campaign=c)
-                d.date_list.append(datetime.datetime.now())
-                d.put()
-            elif prev_donation.count() == 1:
-                # Existing donation - update time to record donation
-                d = prev_donation[0]
-                d.date_list.append(datetime.datetime.now())
-                d.put()
-            else:
-                logging.error('Found multiple Donations with the same url and user.')
-                self.show_main_page('An error occured with your donation.')
-
-            # Keep count of donations for this campaign
-            c.count += 1
-            c.put()
-
-            if from_bookmarklet:
-                self.render('bookmarklet', {'msg':'Donation saved'})
-            else:
-                self.redirect('profile?id='+me.hashedkey)
+                self.redirect('profile?donated='+link)
         else:
-            logging.error('Found multiple Campaigns with the same url.')
             self.show_main_page('An error occured with your donation.')
 
-class UnDonate(BaseHandler):
+class UndoDonation(BaseHandler):
+    def get(self):
+        link = self.request.get('link')
+        me   = self.get_or_create_logged_in_person()
+        c = Campaign.gql("WHERE link = :1", link)[0]
+        d = PennyDonation.gql("WHERE campaign = :1 AND donator = :2",c,me)[0]
+        sum = len(d.date_list)
+        if sum == 1:
+            d.delete()
+        else:
+            d.date_list.pop()
+            d.put()
+        c.count -= 1
+        c.put()
+        self.redirect('/profile?undone='+link)
+
+class DeleteDonations(BaseHandler):
     def get(self):
         link = self.request.get('link')
         me   = self.get_or_create_logged_in_person()
@@ -233,16 +242,18 @@ class UnDonate(BaseHandler):
         d.delete()
         c.count -= sum
         c.put()
-        self.redirect('/profile?id='+me.hashedkey)
+        self.redirect('/profile?delete='+link)
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
                                       ('/home',HomePage),
-                                      ('/profile',PersonPage),
-                                      ('/about', AboutPage),
-                                      ('/faq', FAQPage),
-                                      ('/donate', Donate),
-                                      ('/undonate', UnDonate),],
+                                      ('/profile',ProfilePage),
+                                      ('/about',AboutPage),
+                                      ('/faq',FAQPage),
+                                      ('/donate',Donate),
+                                      ('/undo',UndoDonation),
+                                      ('/delete',DeleteDonations),
+                                      ('/checkout',CheckOutPage),],
                                      debug=True)
 
 def main():

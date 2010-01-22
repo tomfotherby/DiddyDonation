@@ -18,8 +18,8 @@
 
         <h4 style="margin-bottom:4px;">Diddydonate a webpage</h4>
         <form action="/donate" method="get">
-          <input type="text" name="link" value="http://" />
-          <input type="submit" value="Donate" />
+          <input type="text" name="link" style="width:200px" value="http://www.diddydonation.com" />
+          <button class="sexybutton" type="submit" ><span><span><span class="addonep">Diddydonate</span></span></span></button>
         </form>
     </div>
 
@@ -28,8 +28,9 @@
         {% for campaign in campaigns %}
             <div style="padding: 3px 0;">
             <span class="amount">{{ campaign.count }}p</span>
-            <a title="pledge 1p to this webpage" href="/donate?link={{ campaign.link }}"><img src="static/icons/coins_add.png" /></a>
-            {{ campaign.link|urlizetrunc:40 }}
+            <!--<a title="pledge 1p to this webpage" href="/donate?link={{ campaign.link }}"><img src="static/icons/coins_add.png" /></a>-->
+            {{ campaign.link|urlizetrunc:35 }}
+            <a href="/donate?link={{ campaign.link }}" title="pledge 1p to this webpage" class="sexybutton"><span><span><span class="addonep">Diddydonate</span></span></span></a>
             </div>
         {% endfor %}
     </div>
