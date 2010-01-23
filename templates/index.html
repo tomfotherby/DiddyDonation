@@ -1,42 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Diddy Donation{% endblock %}
+{% block title %}Diddydonation - Homepage{% endblock %}
 
 {% block content %}
 
     <div id="intro" class="larger">
         <span>
-        Give a one penny donation to any webpage that you find interesting, useful or fun.
-        {% if not user %}
+        Pledge a one penny donation to any webpage that you find interesting, useful or fun.
+        {% if not lip %}
          <a href="{{ login_url }}" style="text-decoration:underline;" class="good">Login to get started &rarr;</a>
         {% endif %}
         </span>
     </div>
 
+    <h4 style="margin:50px 0 4px;">Diddydonate a webpage</h4>
+    <form action="/donate" method="get">
+      <input type="text" name="link" style="width:200px" value="http://" />
+      <button class="sexybutton" type="submit" ><span><span><span class="onepenny">Pledge</span></span></span></button>
+    </form>
 
-    <div class="column" style="float:right;">
+    <h2 style="margin:50px 0 4px;">Latest Donations</h2>
+    {% for campaign in campaigns %}
+        <div style="padding: 3px 0;">
+        <span class="amount">{{ campaign.count }}p</span>
+        <!--<a title="pledge 1p to this webpage" href="/donate?link={{ campaign.link }}"><img src="static/icons/coins_add.png" /></a>-->
+        {{ campaign.link|urlizetrunc:35 }}
+        <a href="/donate?link={{ campaign.link }}" title="pledge 1p to this webpage" class="sexybutton"><span><span><span class="addonep">Pledge 1p</span></span></span></a>
+        </div>
+    {% endfor %}
 
-        <h4 style="margin-bottom:4px;">Diddydonate a webpage</h4>
-        <form action="/donate" method="get">
-          <input type="text" name="link" style="width:200px" value="http://www.diddydonation.com" />
-          <button class="sexybutton" type="submit" ><span><span><span class="addonep">Diddydonate</span></span></span></button>
-        </form>
-    </div>
-
-    <div id="top_websites" class="column">
-        <h2>Latest Donations</h2>
-        {% for campaign in campaigns %}
-            <div style="padding: 3px 0;">
-            <span class="amount">{{ campaign.count }}p</span>
-            <!--<a title="pledge 1p to this webpage" href="/donate?link={{ campaign.link }}"><img src="static/icons/coins_add.png" /></a>-->
-            {{ campaign.link|urlizetrunc:35 }}
-            <a href="/donate?link={{ campaign.link }}" title="pledge 1p to this webpage" class="sexybutton"><span><span><span class="addonep">Diddydonate</span></span></span></a>
-            </div>
-        {% endfor %}
-    </div>
-
-
-
-
-    <div style="clear:both;"></div>
 {% endblock %}

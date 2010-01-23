@@ -12,9 +12,6 @@ from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
-_DEBUG = False
-
-
 ############## Models ###################
 
 # Table to store webpages and who should get money if someone donates to this page
@@ -58,6 +55,7 @@ class BaseHandler(webapp.RequestHandler):
 
     logged_in_person = None
 
+    # Get logged in person and create DiddyMember Entity if doesn't already exist
     def get_or_create_logged_in_person(self):
         if self.logged_in_person:
             return self.logged_in_person
@@ -78,26 +76,25 @@ class BaseHandler(webapp.RequestHandler):
 
     def render(self, template_name, extra_values={}):
 
+        # Marshal the variables passed to template files
         values = {
         'request': self.request,
         'lip': self.get_or_create_logged_in_person(),
         'login_url': users.create_login_url('/home'),
-        'logout_url': users.create_logout_url('http://%s/' % (self.request.host,)),
-        'debug': self.request.get('deb')}
-
+        'logout_url': users.create_logout_url('http://%s/' % (self.request.host,))}
         values.update(extra_values)
-        cwd = os.path.dirname(__file__)
-        path = os.path.join(cwd, 'templates', template_name + '.html')
-        logging.debug(path)
-        self.response.out.write(template.render(path, values, debug=_DEBUG))
 
+        # Get template file
+        template_file = os.path.join(os.path.dirname(__file__), 'templates', template_name + '.html')
+        logging.debug(template_file)
+
+        # Render page using given template
+        self.response.out.write(template.render(template_file, values, debug=True))
+
+    #Do an internal (non-302) redirect to the front page. Preserves the user agent's requested URL.
     def show_main_page(self, error_msg=None):
-        """Do an internal (non-302) redirect to the front page.
-
-        Preserves the user agent's requested URL.
-        """
         page = MainPage()
-        page.request = self.request
+        page.request  = self.request
         page.response = self.response
         page.get(error_msg)
 
@@ -107,13 +104,16 @@ class MainPage(BaseHandler):
         campaigns = Campaign.gql("ORDER BY date DESC LIMIT 7")
         self.render('index', {'campaigns': campaigns,'error_msg': error_msg})
 
-class HomePage(BaseHandler):
+
+class GetBookmarkletPage(BaseHandler):
     def get(self):
         if users.get_current_user():
             me = self.get_or_create_logged_in_person()
-            self.render('home',{'bookmarklet': bookmarklet(self.request.host, me)})
+            self.render('bookmarklet',{'bookmarklet': bookmarklet(self.request.host, me)})
         else:
+            logging.info('Non-logged in user trying to access GetBookmarkletPage.')
             self.redirect('/')
+
 
 class ProfilePage(BaseHandler):
     def get(self):
@@ -131,20 +131,23 @@ class ProfilePage(BaseHandler):
             'donatedlink':self.request.get('donated'),
             'deletedlink':self.request.get('delete')}
 
-        self.render('person',template_values)
+        self.render('profile',template_values)
 
 
 class FAQPage(BaseHandler):
     def get(self):
         self.render('faq',{})
 
+
 class AboutPage(BaseHandler):
     def get(self):
         self.render('about',{})
 
+
 class CheckOutPage(BaseHandler):
     def get(self):
         self.render('checkout',{})
+
 
 class Donate(BaseHandler):
     def do_donate(self, link, diddyMember):
@@ -210,11 +213,12 @@ class Donate(BaseHandler):
 
         if self.do_donate(link,me):
             if from_bookmarklet:
-                self.render('bookmarklet', {'msg':'Donation saved','nickname':me.google_user.nickname(),'link':link})
+                self.render('bookmarklet-popup', {'msg':'Donation saved','nickname':me.google_user.nickname(),'link':link})
             else:
                 self.redirect('profile?donated='+link)
         else:
             self.show_main_page('An error occured with your donation.')
+
 
 class UndoDonation(BaseHandler):
     def get(self):
@@ -232,6 +236,7 @@ class UndoDonation(BaseHandler):
         c.put()
         self.redirect('/profile?undone='+link)
 
+
 class DeleteDonations(BaseHandler):
     def get(self):
         link = self.request.get('link')
@@ -244,9 +249,10 @@ class DeleteDonations(BaseHandler):
         c.put()
         self.redirect('/profile?delete='+link)
 
+
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
-                                      ('/home',HomePage),
+                                      ('/bookmarklet',GetBookmarkletPage),
                                       ('/profile',ProfilePage),
                                       ('/about',AboutPage),
                                       ('/faq',FAQPage),

@@ -14,9 +14,9 @@
     <div id="header">
         <div id="lip" style="font-size:smaller;">
             {% if lip %}
-            <a href="/home">bookmarklet</a>
-            <a href="/profile">profile</a>
-            <a href="{{ logout_url }}">logout</a>
+            <a href="/bookmarklet">bookmarklet</a>
+            | <a href="/profile">profile</a>
+            | <a href="{{ logout_url }}">logout</a>
             {% else %}
             <a href="{{ login_url }}">login</a>
             {% endif %}

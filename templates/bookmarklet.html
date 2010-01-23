@@ -1,19 +1,31 @@
-<html>
-<head>
-<title>Diddydonate</title>
-</head>
+{% extends 'base.html' %}
 
-<body onload="setTimeout('window.close()',5000)">
+{% block title %}Diddydonation - Bookmarklet installation{% endblock %}
 
-<div style="font-size:1.2em">
-{{msg}}
+{% block content %}
+
+<div id="intro">
+<h3 class="good">Welcome, {{lip.google_user.nickname}}</h3>
 </div>
 
-<p>
-If you are not <em>{{nickname}}</em>: <a href="/undo?link={{ link }}" title="Undo Pledge" >Undo Donation</a>
-<p>
+<h2>How to use this website</h2>
 
-<span style="font-size:.7em;color:#999;">window closing...</span>
-</body>
+<h3>1) Install the bookmarklet</h3>
+<p>
+Drag the following thingy to your bookmarks toolbar: <a href="{{bookmarklet}}" title="Diddy Donate" alt="Diddy Donate" style="text-decoration:underline;"><img src="/static/images/bookmarklet.gif" alt="Diddydonate" /></a>
+</p>
+<p>
+<span class="question">What's the point of this bookmarklet thingy?</span> Using the bookmarklet means you don't need to login to donate.
+</p>
 
-</html>
+<h3>2) Use the bookmarklet to pledge 1p to any webpage</h3>
+<p>
+When you visit a website that has something interesting, useful or fun and wish to show your appreciation, click the <img src="/static/images/bookmarklet.gif" /> bookmarklet in your toolbar to pledge a 1p tip.
+</p>
+
+<h3>3) Check back often</h3>
+<p>
+To see if any of your pledges have received enough other pledges to warrent you getting out your wallet (or purse).
+</p>
+
+{% endblock %}
