@@ -1,14 +1,48 @@
-* {}
+/* CSS reset (Based on Yahoos) */
+
+html{color:#333;background:#FFF}
+body,div,dl,dt,dd,ul,ol,li,pre,code,form,fieldset,legend,input,button,textarea,p,blockquote,th,td{margin:0;padding:0}
+table{border-collapse:collapse;border-spacing:0}
+fieldset,img{border:0}
+address,caption,cite,code,dfn,th,var,optgroup{font-style:inherit;font-weight:inherit}
+del,ins{text-decoration:none}
+li{list-style:none}
+caption,th{text-align:left}
+h1,h2,h3,h4,h5,h6{font-size:100%;margin:0;padding:0;font-weight:bold}
+q:before,q:after{content:''}
+abbr,acronym{border:0;font-variant:normal}
+sup{vertical-align:baseline}
+sub{vertical-align:baseline}
+legend{color:#000}
+input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit}
+input,button,textarea,select{*font-size:100%}
+
+
+/* Element styling (a.k.a base) */
 
 body {font-family:helvetica,sans-serif;padding:1em;}
-hr {}
+
+h1 {font-size:138.5%}
+h2 {font-size:123.1%}
+h3 {font-size:108%}
+h1,h2,h3 {margin:1em 0}
+acronym {border-bottom:1px dotted #000;cursor:help}
+blockquote {margin:1em;padding-left:0.5em;border-left:3px solid #4491e0}
+ul,ol,dl {margin:1em 1em 1em 2em}
+ol li {list-style: decimal outside}
+ul li {list-style: disc outside}
+dl dd {margin-left:1em}
+th,td {border:1px solid #000;padding:.5em}
+th {font-weight:bold;text-align:center}
+p,fieldset,table { margin-bottom:1em}
+
 a {color:#000;}
 a:hover {text-decoration:underline;}
 a:visited {color:#000;}
 
 #bookmarklet {width: 15em;padding:.5em;margin-right:0;margin-top:2em;border: 1px solid #000;}
 #wrap {margin: 0 auto;width:600px;}
-#logo {float:left;width:100px;border:none;}
+#logo {float:left;}
 #moto {float:left;margin-left:20px;}
 #intro {margin-bottom:20px;}
 #content {margin-left:.5em;}
@@ -20,12 +54,25 @@ a:visited {color:#000;}
 #footer {margin-top:2em;}
 #footer a {color:#999;}
 
+/* Style Toolbox */
+
+.clearAfter:after {clear: both;content: ".";display: block;height: 0;visibility: hidden}
+.clearAfter {zoom:1}
+
+/* Site Styling */
+
+.pagetitle {height:48px;line-height:48px}
+.pagetitle img {width:48px;height:48px;vertical-align:middle;margin-right:5px}
+
 .amount {background-color: #89605a;color:white;padding:2px;border: 1px solid #000; text-shadow:1px 1px 1px black; border-radius: 10px;-moz-border-radius: 10px;-webkit-border-radius: 10px}
 .question {font: italic 1em Georgia, Times, serif;color: #777}
 
 .infoBox {padding: 4px 18px;background:#FFFFCC url("images/icons/info.png") center left no-repeat;color:black;border:1px solid #DEDEDE}
 .success {background:#EEF4D4 url("images/icons/accept.png") center left no-repeat;color:#99A758;border:1px solid #E8EECA}
 .failure {background:#EEF4D4 url("images/icons/exclamation.png") center left no-repeat;color:#99A758;border:1px solid red}
+
+.showClosed {padding-left: 18px; background:url("images/icons/block.png") no-repeat center left}
+
 
 .column {float:left;overflow:hidden;}
 .subtle, a.subtle {color:#999;}
@@ -35,7 +82,14 @@ a:visited {color:#000;}
 .bold, a.bold {font-weight:bold;}
 .bad {color:#a00;}
 .title {font-size:2em;font-weight:bold;}
-.bookmarklet {border:none;}
+
+.campaignCheckout {margin: 10px 0 30px 10px}
+.campaignCheckout h4 {margin-bottom: 5px}
+.campaignCheckout img {float:left;margin: 0 10px 0 30px}
+.campaignLinks {height:37px;width:300px;overflow:auto;float:left;color:#CCC}
+.campaignLinks a {color:#CCC;font-size:0.9em}
+
+/* Button Styling */
 
 .sexybutton {display: inline-block;margin: 0;padding: 0;font: bold 13px "Helvetica Neue", Helvetica, Arial, clean, sans-serif;text-decoration: none;text-shadow: 1px 1px 2px rgba(0,0,0,0.20);background: none;border: none;white-space: nowrap;cursor: pointer;user-select: none;-moz-user-select: none;_width: 0;overflow: visible;}
 .sexybutton span {display: block;height: 24px;padding-right: 12px;background-repeat: no-repeat;background-position: right top;}
@@ -58,6 +112,8 @@ a:visited {color:#000;}
 .sexybutton span.subtractonep { background-image: url(images/icons/subtractonep.png); }
 .sexybutton span.delete       { background-image: url(images/icons/cross.png); }
 .sexybutton span.onepenny     { background-image: url(images/icons/onepenny.png); }
+.sexybutton span.useradd      { background-image: url(images/icons/user_add.png); }
+.sexybutton span.checkout      { background-image: url(images/icons/basket_go.png); }
 
 
 

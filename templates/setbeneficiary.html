@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Diddydonation - Set Beneficiary{% endblock %}
+
+{% block content %}
+
+<h2>Suggest a beneficiary for a webpage</h2>
+
+<p>
+In order for a webpage to be able to accept donations, it must be linked to a <a href="http://pledgie.com/">Pledgie Campaign</a>.
+Please go to the <a href="http://pledgie.com/">Pledgie search page</a> and find the campaign number of a suitable campaign.
+</p>
+
+<div class="question">
+How do I find the campaign number?
+</div>
+<div>
+From the address bar of your browser: <img src="static/images/pledgieCampaignSS.png" />
+</div>
+
+
+<p>
+<form action="/setbeneficiary" method="post">
+  <label for="link">Webpage:</label>
+  <input type="text" id="link" name="link" value="{{ link }}" style="width:250px"  /><br />
+  <label for="campaignid">Pledgie campaign ID:</label>
+  <input type="text" id="campaignid" name="campaignid" style="width:50px" /><br />
+  <input type="submit" value="Submit" />
+</form>
+</p>
+{% endblock %}

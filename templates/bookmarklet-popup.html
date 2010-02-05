@@ -3,8 +3,8 @@
 <title>Diddydonate</title>
 </head>
 <body onload="setTimeout('window.close()',5000)">
-<div style="font-size:1.2em">{{msg}}</div>
-<p>If you are not <em>{{nickname}}</em>: <a href="/undo?link={{ link }}" title="Undo Pledge" >Undo Donation</a><p>
+<div style="font-size:1.2em"><img width=48 height=48 src="/static/images/icons/tick_48.png" />{{msg}}</div>
+<p>If you are not <em>{{nickname}}</em>: <a href="/undo?link={{ link }}&bookmarklet=true&k={{ k }}" title="Undo Pledge" >Undo Donation</a><p>
 <span style="font-size:.7em;color:#999;">window will close shortly...</span>
 </body>
 </html>

@@ -10,6 +10,27 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: Campaign
+  properties:
+  - name: pledgie_id
+  - name: count
+
+- kind: Campaign
+  properties:
+  - name: pledgie_id
+  - name: count
+    direction: desc
+
+- kind: PennyDonation
+  properties:
+  - name: donator
+  - name: campaign
+
+- kind: PennyDonation
+  properties:
+  - name: donator
+  - name: count
+
 - kind: PennyDonation
   properties:
   - name: donator

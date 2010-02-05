@@ -4,7 +4,8 @@
 
 {% block content %}
 
-<span class="title">{{ lip.google_user.nickname }}</span>
+<h1 class="pagetitle"><img src="/static/images/icons/user_48.png" />{{ lip.google_user.nickname }}</h1>
+
 
 {% if undonelink %}
 <div class="infoBox flash" style="margin-top:10px">
@@ -25,20 +26,20 @@ All donations deleted for {{ deletedlink|urlizetrunc:45 }}
 
 
 <p>
-<span>Total pledged: <strong>{{pledged}}p</strong>.</span>
+<div>Total pledged: <strong>{{pledged}}p</strong></div>
 
 {% ifnotequal pledged 0 %}
-Go to <a href="/checkout">checkout</a>.
+<a href="/checkout" title="Go to Checkout" class="sexybutton"><span><span><span class="checkout">Checkout</span></span></span></a>
 {% endifnotequal %}
 
-<h3>Your latest pledges:</h3>
+<h3 style="margin-top:50px">Your pledges:</h3>
 
 {% if donations|length %}
 
 <div class="column" style="margin-right:30px;">
   {% for d in donations %}
     <div style="padding: 4px 0 10px 0;">
-        <span class="amount">{{ d.date_list|length }}p</span>
+        <span class="amount">{{ d.count }}p</span>
         <!--
         <a href="/donate?link={{ d.campaign.link }}" title="Pledge another 1p" ><img src="static/icons/coins_add.png" /></a>
         <a href="/delete?link={{ d.campaign.link}}" title="Remove" onclick="return confirm('Delete all pledges to this webpage?');"><img src="static/icons/coins_delete.png" /></a>
@@ -46,9 +47,9 @@ Go to <a href="/checkout">checkout</a>.
         {{ d.campaign.link|urlizetrunc:60 }}
         <div style="padding: 2px 0 0 25px;">
         <a href="/donate?link={{ d.campaign.link }}" title="Pledge another 1p" class="sexybutton"><span><span><span class="addonep">Pledge again</span></span></span></a>
-        {% if not d.date_list|length_is:1 %}
+        {% ifnotequal d.count 1 %}
             <a href="/undo?link={{ d.campaign.link }}" title="Remove 1p from Pledge" class="sexybutton"><span><span><span class="subtractonep">Undo</span></span></span></a>
-        {% endif %}
+        {% endifnotequal %}
         <a href="/delete?link={{ d.campaign.link}}" title="Delete pledges" class="sexybutton" onclick="return confirm('Delete all pledges to this webpage?');"><span><span><span class="delete">Delete</span></span></span></a>
         </div>
     </div>

@@ -19,7 +19,12 @@ import Cookie
 import logging
 import datetime
 
+# To be able to use Google user accounts
 from google.appengine.api import users
+
+# To be able to fetch URL (to get pledgie campaign name from ID)
+from google.appengine.api import urlfetch
+from django.utils import simplejson
 
 from google.appengine.ext import webapp
 from google.appengine.ext import db
@@ -28,13 +33,10 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 ############## Models ###################
 
-# Table to store webpages and who should get money if someone donates to this page
-class Campaign(db.Model):
-    link         = db.LinkProperty(required=True)
-    beneficiary  = db.UserProperty()
-    created_date = db.DateTimeProperty(auto_now_add=True)
-    date         = db.DateTimeProperty(auto_now=True)
-    count        = db.IntegerProperty(required=True, default=0)
+# Beneficiaries table - link to Plegie campaign
+#class DiddyBeneficiary(db.Model):
+#    google_user      = db.UserProperty(required=True)
+#    pledgie_campaign = db.IntegerProperty(required=True)
 
 # Members table - hashedkey is used to avoid login when using bookmarklet
 class DiddyMember(db.Model):
@@ -47,13 +49,28 @@ class DiddyMember(db.Model):
         assert self.hashedkey
         return db.Model.put(self)
 
+# Table to store webpages and the beneficiary if someone donates to this page
+class Campaign(db.Model):
+    link         = db.LinkProperty(required=True)
+    #beneficiary = db.ReferenceProperty(DiddyBeneficiary)
+    pledgie_id   = db.IntegerProperty()
+    pledgie_name = db.StringProperty()
+    created_date = db.DateTimeProperty(auto_now_add=True)
+    date         = db.DateTimeProperty(auto_now=True)
+    count        = db.IntegerProperty(default=0)
+
 # Donations table
 # Note: multiple donations to the same webpage by the same user are stored in the same entity (via ListProperty)
 class PennyDonation(db.Model):
-    donator   = db.ReferenceProperty(DiddyMember,required=True)
+    donator   = db.ReferenceProperty(DiddyMember,required=True,collection_name='donations')
     campaign  = db.ReferenceProperty(Campaign,required=True)
     date_list = db.ListProperty(datetime.datetime)
     date      = db.DateTimeProperty(auto_now=True)
+    count     = db.IntegerProperty(default=0)
+    def put(self):
+        # keep count up to date
+        self.count = len(self.date_list)
+        return db.Model.put(self)
 
 ############# Utils #####################
 def bookmarklet(host, person):
@@ -77,9 +94,8 @@ class BaseHandler(webapp.RequestHandler):
         if me:
             persons = DiddyMember.gql("WHERE google_user = :1",me)
             if persons.count() == 0:
-                # Save new DiddyMember to datastore (and auto-generate a hash)
-                p = DiddyMember(google_user=users.get_current_user())
-                p.put()
+                # Save new DiddyMember to datastore (auto-generates a hash to store their ID secretly)
+                p = DiddyMember(google_user=users.get_current_user()).put()
             elif persons.count() == 1:
                 p = persons[0]
             else:
@@ -94,7 +110,7 @@ class BaseHandler(webapp.RequestHandler):
         values = {
         'request': self.request,
         'lip': self.get_or_create_logged_in_person(),
-        'login_url': users.create_login_url('/home'),
+        'login_url': users.create_login_url('/bookmarklet'),
         'logout_url': users.create_logout_url('http://%s/' % (self.request.host,))}
         values.update(extra_values)
 
@@ -136,7 +152,7 @@ class ProfilePage(BaseHandler):
         donations = list(donations)
         pledged = 0
         for d in donations:
-            pledged += len(d.date_list)
+            pledged += d.count
 
         template_values = {
             'donations':donations,
@@ -159,8 +175,98 @@ class AboutPage(BaseHandler):
 
 
 class CheckOutPage(BaseHandler):
+
+    class Campaign(object):
+        def __init__( self, pledgieID ):
+            self.pledgieID = pledgieID
+            self.webpages = list()
+            self.total = 0
+
     def get(self):
-        self.render('checkout',{})
+        me = self.get_or_create_logged_in_person()
+        ok_donations  = list();
+        ko_donations  = list();
+        low_donations = list();
+        link_list     = {};
+        name_list     = {};
+        value_list    = {};
+        totvalue_list = {};
+
+
+        #low_donations = PennyDonation.gql("WHERE donator = :1 AND count < 1000",me)
+        #low_donations = list(low_donations)
+        #noBeneficiary_donations = PennyDonation.gql("WHERE donator = :1 AND count < 1000",me)
+        #noBeneficiary_donations = list(noBeneficiary_donations)
+
+        #donations = PennyDonation.gql("WHERE donator = :1 ORDER BY campaign",me)
+        #for d in donations:
+        for d in me.donations:
+            pledgieID   = d.campaign.pledgie_id
+            pledgieName = d.campaign.pledgie_name
+
+            if pledgieID == None:
+                ko_donations.append(d);
+            else:
+                if link_list.has_key(pledgieID):
+                    link_list[pledgieID].append(d.campaign.link)
+                    value_list[pledgieID].append(d.count)
+                    totvalue_list[pledgieID] += d.count
+                else:
+                    link_list[pledgieID]     = [d.campaign.link,]
+                    value_list[pledgieID]    = [d.count,]
+                    name_list[pledgieID]     = pledgieName
+                    totvalue_list[pledgieID] = d.count
+
+
+
+        outtext = '';
+        for k in link_list:
+            pId = str(k)
+            outtext += '<div class="campaignCheckout clearAfter"><h4><span class="amount">'+str(totvalue_list[k])+'p</span> '+name_list[k]+'<br></h4>'
+            outtext += ' <a href="http://www.pledgie.com/campaigns/'+pId+'"><img width=149 height=37 alt="Click here to lend your support to: TODO and make a donation at www.pledgie.com !" src="http://www.pledgie.com/campaigns/'+pId+'.png?skin_name=chrome" border="0" /></a> '
+            outtext += ' <div class="campaignLinks">'
+            for link in link_list[k]:
+                outtext += '  <a href='+link+'>'+link+'</a>, '
+            outtext += ' </div>'
+            outtext += '</div>'
+
+
+        template_values = {
+            'ko_donations':ko_donations,
+            'outtext':outtext}
+
+        self.render('checkout',template_values)
+
+class SetBeneficiary(BaseHandler):
+    def get(self):
+        self.render('setbeneficiary',{'link':self.request.get('link')})
+    def post(self):
+        link       = self.request.get('link')
+        campaignID = self.request.get('campaignid')
+        campaign = Campaign.gql("WHERE link = :1", link)
+        if campaign.count() == 1:
+            c = campaign[0]
+            c.pledgie_id = int(campaignID)
+            url = "http://www.pledgie.com/campaigns/"+campaignID+'.json'
+            result = urlfetch.fetch(url)
+            if result.status_code == 200:
+                jsonDict = simplejson.loads(result.content)
+                c.pledgie_name = jsonDict['campaign']['title']
+            else:
+                logging.error('Error fetching Pledgie Name')
+                self.show_main_page('An error occured with your suggestion.')
+            c.put()
+            self.redirect('setbeneficiaries')
+        else:
+            logging.error('Found multiple Campaigns with the same url while suggesting a beneficiary.')
+            self.show_main_page('An error occured with your suggestion.')
+
+
+class SetBeneficiaries(BaseHandler):
+    def get(self):
+        ko_campaigns = Campaign.gql("WHERE pledgie_id = :1 ORDER BY count DESC",None)
+        ko_campaigns = list(ko_campaigns)
+        self.render('setbeneficiaries',{'ko_campaigns':ko_campaigns})
 
 
 class Donate(BaseHandler):
@@ -169,8 +275,7 @@ class Donate(BaseHandler):
 
         if campaign.count() == 0:
             # Create new Campaign
-            c = Campaign(link=link, count=1)
-            c.put()
+            c = Campaign(link=link, count=1).put()
             # Create new donation
             d = PennyDonation(donator=diddyMember,campaign=c)
             d.date_list.append(datetime.datetime.now())
@@ -227,7 +332,7 @@ class Donate(BaseHandler):
 
         if self.do_donate(link,me):
             if from_bookmarklet:
-                self.render('bookmarklet-popup', {'msg':'Donation saved','nickname':me.google_user.nickname(),'link':link})
+                self.render('bookmarklet-popup', {'msg':'Donation saved','nickname':me.google_user.nickname(),'link':link,'k':self.request.get('k')})
             else:
                 self.redirect('profile?donated='+link)
         else:
@@ -237,7 +342,21 @@ class Donate(BaseHandler):
 class UndoDonation(BaseHandler):
     def get(self):
         link = self.request.get('link')
-        me   = self.get_or_create_logged_in_person()
+        from_bookmarklet = self.request.get('bookmarklet') == 'true'
+        if from_bookmarklet:
+            # Get person from hashedkey in the bookmarklet
+            donators = DiddyMember.gql("WHERE hashedkey = :1", self.request.get('k'))
+            if donators.count() == 1:
+                me = donators[0]
+            else:
+                logging.error('Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
+                self.show_main_page('An error occured with the undo.')
+        else:
+            if not users.get_current_user():
+                self.redirect(users.create_login_url(self.request.uri))
+                return
+            else:
+                me = self.get_or_create_logged_in_person()
         c = Campaign.gql("WHERE link = :1", link)[0]
         d = PennyDonation.gql("WHERE campaign = :1 AND donator = :2",c,me)[0]
         sum = len(d.date_list)
@@ -248,7 +367,10 @@ class UndoDonation(BaseHandler):
             d.put()
         c.count -= 1
         c.put()
-        self.redirect('/profile?undone='+link)
+        if from_bookmarklet:
+            self.render('bookmarklet-popup-undo', {})
+        else:
+            self.redirect('/profile?undone='+link)
 
 
 class DeleteDonations(BaseHandler):
@@ -273,7 +395,9 @@ application = webapp.WSGIApplication(
                                       ('/donate',Donate),
                                       ('/undo',UndoDonation),
                                       ('/delete',DeleteDonations),
-                                      ('/checkout',CheckOutPage),],
+                                      ('/checkout',CheckOutPage),
+                                      ('/setbeneficiary',SetBeneficiary),
+                                      ('/setbeneficiaries',SetBeneficiaries)],
                                      debug=True)
 
 def main():

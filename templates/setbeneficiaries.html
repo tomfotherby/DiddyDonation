@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Diddydonation - Set Beneficiaries{% endblock %}
+
+{% block content %}
+
+<h1>Campaigns where the beneficiary needs clarifying</h1>
+
+{% if ko_campaigns|length %}
+<div style="margin:5px 30px 0 0;">
+  {% for c in ko_campaigns %}
+    <div style="padding: 4px 0 10px 0;">
+        <span class="amount">{{ c.count }}p</span>
+        {{ c.link|urlizetrunc:60 }}
+        <div style="padding: 2px 0 0 25px;">
+        <a href="/setbeneficiary?link={{ c.link }}" title="Suggest a beneficiary" class="sexybutton"><span><span><span class="useradd">Suggest beneficiary details</span></span></span></a>
+        </div>
+    </div>
+  {% endfor %}
+</div>
+{% else %}
+All campaigns have beneficiaries
+{% endif %}
+
+{% endblock %}
