@@ -15,16 +15,18 @@ Please go to the <a href="http://pledgie.com/">Pledgie search page</a> and find 
 How do I find the campaign number?
 </div>
 <div>
-From the address bar of your browser: <img src="static/images/pledgieCampaignSS.png" />
+From the address bar of your browser: <img src="/static/images/pledgieCampaignSS.png" />
 </div>
 
 
 <p>
-<form action="/setbeneficiary" method="post">
+<form action="/admin/setbeneficiary" method="post">
   <label for="link">Webpage:</label>
   <input type="text" id="link" name="link" value="{{ link }}" style="width:250px"  /><br />
-  <label for="campaignid">Pledgie campaign ID:</label>
-  <input type="text" id="campaignid" name="campaignid" style="width:50px" /><br />
+  <label for="pledgieid">Pledgie campaign ID:</label>
+  <input type="text" id="pledgieid" name="pledgieid" style="width:50px" /><br />
+  <label for="paypalemail">Paypal Email:</label>
+  <input type="text" id="paypalemail" name="paypalemail" style="width:200px" /><br />
   <input type="submit" value="Submit" />
 </form>
 </p>

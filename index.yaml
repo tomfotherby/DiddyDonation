@@ -12,6 +12,12 @@ indexes:
 
 - kind: Campaign
   properties:
+  - name: beneficiary
+  - name: count
+    direction: desc
+
+- kind: Campaign
+  properties:
   - name: pledgie_id
   - name: count
 

@@ -8,30 +8,20 @@
 <h1 class="pagetitle"><img src="/static/images/icons/buy_48.png" />Checkout</h1>
 
 {% if outtext|length %}
-<h3>Your Campaigns</h3>
-<p>
-To make a donation, we recommend <a href="http://www.pledgie.com">Pledgie.com</a>:
-</p>
-{{ outtext }}
+    <h3>Your Campaigns</h3>
+    {{ outtext }}
 {% endif %}
 
-
 {% if ko_donations|length %}
-<h3 style="margin-top:50px">Pledges where the beneficiary needs clarifying</h3>
-<p>
-The following webpages have no beneficiary defined and so can't be completed at this time:
-</p>
-<div style="margin:5px 30px 0 0;">
   {% for d in ko_donations %}
-    <div style="padding: 4px 0 10px 0;">
+    <div class="campaignCheckout">
         <span class="amount">{{ d.count }}p</span>
         {{ d.campaign.link|urlizetrunc:60 }}
         <div style="padding: 2px 0 0 25px;">
-        <span class="showClosed">Checkout closed</span> - still need to confirm the beneficiary
+        <span class="showClosed">Checkout closed</span> - we need to confirm the beneficiary
         </div>
     </div>
   {% endfor %}
-</div>
 {% endif %}
 
 

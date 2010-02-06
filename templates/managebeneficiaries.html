@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Diddydonation - Admin Section{% endblock %}
+
+{% block content %}
+
+<a href="/admin/setbeneficiaries">Set Beneficiaries</a>
+
+<h1>Beneficiaries</h1>
+
+{% if beneficiaries|length %}
+<ol>
+  {% for b in beneficiaries %}
+    <li>
+        {{ b.google_user}} {{ b.pledgie_id }}
+    </li>
+  {% endfor %}
+</ol>
+{% else %}
+No beneficiaries.
+
+<h3>Create test Beneficiary:</h3>
+<form action="/admin/createbeneficiary" method="post">
+  google_user: <input type="text" name="google_user" style="width:200px" value="test@example.com" /><br />
+  paypal_email: <input type="text" name="paypal_email" style="width:200px" value="test@example.com" /><br />
+  pledgie_id: <input type="text" name="pledgie_id" style="width:50px" value="8316" /><br />
+  pledgie_name: <input type="text" name="pledgie_name" style="width:200px" value="DiddyDonation.com" /><br />
+  <button class="sexybutton" type="submit" ><span><span><span class="useradd">Create Test Beneficiary</span></span></span></button>
+</form>
+
+{% endif %}
+
+<hr>
+<h3>Create new Beneficiary:</h3>
+<form action="/admin/createbeneficiary" method="post">
+  google_user: <input type="text" name="google_user" style="width:200px" value="" /><br />
+  paypal_email: <input type="text" name="paypal_email" style="width:200px" value="" /><br />
+  pledgie_id: <input type="text" name="pledgie_id" style="width:50px" value="" /><br />
+  pledgie_name: <input type="text" name="pledgie_name" style="width:200px" value="" /><br />
+  <button class="sexybutton" type="submit" ><span><span><span class="useradd">Create New Beneficiary</span></span></span></button>
+</form>
+{% endblock %}
