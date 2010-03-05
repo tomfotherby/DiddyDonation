@@ -87,6 +87,7 @@ class BaseHandler(webapp.RequestHandler):
 
     # Get logged in person and create DiddyMember Entity if doesn't already exist
     def get_or_create_logged_in_person(self):
+        # return if already set
         if self.logged_in_person:
             return self.logged_in_person
         me = users.get_current_user()
@@ -94,13 +95,16 @@ class BaseHandler(webapp.RequestHandler):
             persons = DiddyMember.gql("WHERE google_user = :1",me)
             if persons.count() == 0:
                 # Save new DiddyMember to datastore (auto-generates a hash to store their ID secretly)
-                p = DiddyMember(google_user=users.get_current_user()).put()
+                logging.info('Creating new DiddyMember')
+                p = DiddyMember(google_user=users.get_current_user())
+                p.put()
             elif persons.count() == 1:
                 p = persons[0]
             else:
                 logging.error('Found multiple People with the same hashedkey.')
             self.logged_in_person = p
             return self.logged_in_person
+        logging.error('users.get_current_user() did not return something usable')
         return None
 
     def render(self, template_name, extra_values={}):
@@ -177,12 +181,14 @@ class CheckOutPage(BaseHandler):
 
     def get(self):
         me = self.get_or_create_logged_in_person()
-        ko_donations  = list();
-        link_list     = {};
-        name_list     = {};
-        value_list    = {};
-        totvalue_list = {};
+        min_donation = 1000
+        ko_donations  = list()
+        link_list     = {}
+        name_list     = {}
+        value_list    = {}
+        totvalue_list = {}
 
+        # Group donations into campaigns and sum amount
         for d in me.donations:
             b = d.campaign.beneficiary
 
@@ -202,14 +208,16 @@ class CheckOutPage(BaseHandler):
                     name_list[pledgieID]     = pledgieName
                     totvalue_list[pledgieID] = d.count
 
+        # Build page text -
         outtext = '';
         for k in link_list:
             pId = str(k)
             outtext += '<div class="campaignCheckout clearAfter"><h4><span class="amount">'+str(totvalue_list[k])+'p</span> '+name_list[k]+'<br></h4>'
-            if totvalue_list[k] < 1000:
-                outtext += '<div style="float:left;margin: 0 0 0 30px"><span class="showClosed">Checkout closed</span> - amount too low</div>'
-            else:
-                outtext += ' <a href="http://www.pledgie.com/campaigns/'+pId+'"><img width=149 height=37 alt="Click here to lend your support to: TODO and make a donation at www.pledgie.com !" src="http://www.pledgie.com/campaigns/'+pId+'.png?skin_name=chrome" border="0" /></a> '
+            # TODO - Aggregate all donations to this Campaign and then allow user to add funds to their account
+            #if totvalue_list[k] < min_donation:
+            outtext += '<div style="float:left;margin: 0 0 0 30px"><span class="showClosed">Checkout closed</span> - amount too low (<span class="moreInfo"><a href="/faq#amounttoolow">more info</a></span>)</div>'
+            #else:
+            #    outtext += ' <a href="http://www.pledgie.com/campaigns/'+pId+'"><img width=149 height=37 alt="Click here to lend your support to: TODO and make a donation at www.pledgie.com !" src="http://www.pledgie.com/campaigns/'+pId+'.png?skin_name=chrome" border="0" /></a> '
             outtext += ' <div class="campaignLinks">'
             for link in link_list[k]:
                 outtext += '  <a href='+link+'>'+link+'</a>, '
@@ -277,6 +285,7 @@ class Donate(BaseHandler):
             else:
                 logging.error('Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
                 self.show_main_page('An error occured with your account.')
+                return
         else:
             if not users.get_current_user():
                 self.redirect(users.create_login_url(self.request.uri))

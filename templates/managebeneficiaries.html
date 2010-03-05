@@ -6,16 +6,26 @@
 
 <a href="/admin/setbeneficiaries">Set Beneficiaries</a>
 
-<h1>Beneficiaries</h1>
+<h1>Manage Beneficiaries</h1>
+
+<p style="font-size:small">
+This is a admin page which can be used to create donation beneficiaries. Currently (Jan/10) I'm not sure what form a beneficiary will be, perhaps a Paypal email? or a Plegie campaign?
+Best would be if people would use BACS to add money to the Diddydonation back account and then Diddydonation could aggregate donations to the beneficiary.
+</p>
+
+<h2>Beneficiaries</h2>
 
 {% if beneficiaries|length %}
-<ol>
+<table>
+    <tr>
+        <th>google_user</th><th>paypal_email</th><th>pledgie_id</th><th>pledgie_name</th>
+    </tr>
   {% for b in beneficiaries %}
-    <li>
-        {{ b.google_user}} {{ b.pledgie_id }}
-    </li>
+    <tr>
+        <td>{{ b.google_user}}</td><td>{{ b.paypal_email}}</td><td>{{ b.pledgie_id}}</td><td>{{ b.pledgie_name }}</td>
+    </tr>
   {% endfor %}
-</ol>
+</table>
 {% else %}
 No beneficiaries.
 

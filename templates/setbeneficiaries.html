@@ -6,7 +6,13 @@
 
 <a href="/admin/managebeneficiaries">Manage Beneficiaries</a>
 
-<h1>Campaigns where the beneficiary needs clarifying</h1>
+<h1>Set Beneficiaries</h1>
+
+<p style="font-size:small">
+This is a admin page which can be used to assign a "Campaign" to a "DiddyBeneficiary". This is the first step needed in order for a user to be able to checkout and actually pay a webpage.
+</p>
+
+<h2>Campaigns where the beneficiary needs clarifying</h2>
 
 {% if ko_campaigns|length %}
 <div style="margin:5px 30px 0 0;">
@@ -28,7 +34,7 @@
   {% endfor %}
 </div>
 {% else %}
-All campaigns have beneficiaries
+There are no campaigns that do not have beneficiaries
 {% endif %}
 
 {% endblock %}

@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
     <title>{% block title %}{% endblock %}</title>
@@ -11,42 +12,40 @@
 
     <div id="wrap">
 
-    <div id="header">
-        <div id="lip" style="font-size:smaller;">
-            {% if lip %}
-            <a href="/bookmarklet">bookmarklet</a>
-            | <a href="/profile">your profile</a>
-            | <a href="{{ logout_url }}">logout</a>
-            {% else %}
-            <a href="{{ login_url }}">login</a>
-            {% endif %}
+        <div id="header" class="clearAfter">
+            <div id="lip" style="font-size:smaller;">
+                {% if lip %}
+                <a href="/bookmarklet">bookmarklet</a>
+                | <a href="/profile">your profile</a>
+                | <a href="{{ logout_url }}">logout</a>
+                {% else %}
+                <a href="{{ login_url }}">login</a>
+                {% endif %}
+            </div>
+
+            <a id="logo" href="/"><img width=103 height=104 src="/static/images/logo.jpg" /></a>
+
+            <div id="moto">
+                <h1 style="margin-bottom:0;"><a href="/" style="text-decoration:none;">Diddy Donation</a></h1>
+                <p>
+                Online Micro Donation service
+                </p>
+            </div>
         </div>
 
-        <a href="/"><img id="logo" width=103 heigh=104 src="/static/images/logo.jpg"  /></a>
+        <div id="content">
 
-        <div id="moto">
-            <h1 style="margin-bottom:0;"><a href="/" style="text-decoration:none;">Diddy Donation</a></h1>
-            <p>
-            Online Micro Donation service
-            </p>
+          {% if error_msg %}
+            <div id="error">{{ error_msg }}</div>
+          {% endif %}
+
+          {% block content %}{% endblock %}
         </div>
 
-        <div style="clear:both;"></div>
-    </div>
-
-    <div id="content">
-
-      {% if error_msg %}
-        <div id="error">{{ error_msg }}</div>
-      {% endif %}
-
-      {% block content %}{% endblock %}
-    </div>
-
-    <div id="footer" class="subtle smaller">
-        <a href="/faq">FAQ</a>
-        <a href="/about">About</a>
-    </div>
+        <div id="footer" class="subtle smaller">
+            <a href="/faq">FAQ</a>
+            <a href="/about">About</a>
+        </div>
 
     </div>
 
