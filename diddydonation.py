@@ -167,16 +167,6 @@ class ProfilePage(BaseHandler):
         self.render('profile',template_values)
 
 
-class FAQPage(BaseHandler):
-    def get(self):
-        self.render('faq',{})
-
-
-class AboutPage(BaseHandler):
-    def get(self):
-        self.render('about',{})
-
-
 class CheckOutPage(BaseHandler):
 
     def get(self):
@@ -215,7 +205,7 @@ class CheckOutPage(BaseHandler):
             outtext += '<div class="campaignCheckout clearAfter"><h4><span class="amount">'+str(totvalue_list[k])+'p</span> '+name_list[k]+'<br></h4>'
             # TODO - Aggregate all donations to this Campaign and then allow user to add funds to their account
             #if totvalue_list[k] < min_donation:
-            outtext += '<div style="float:left;margin: 0 0 0 30px"><span class="showClosed">Checkout closed</span> - amount too low (<span class="moreInfo"><a href="/faq#amounttoolow">more info</a></span>)</div>'
+            outtext += '<div style="float:left;margin: 0 0 0 30px"><span class="showClosed">Checkout closed</span> - amount too low (<span class="moreInfo"><a href="http://blog.diddydonation.com/faq#amounttoolow">learn more</a></span>)</div>'
             #else:
             #    outtext += ' <a href="http://www.pledgie.com/campaigns/'+pId+'"><img width=149 height=37 alt="Click here to lend your support to: TODO and make a donation at www.pledgie.com !" src="http://www.pledgie.com/campaigns/'+pId+'.png?skin_name=chrome" border="0" /></a> '
             outtext += ' <div class="campaignLinks">'
@@ -402,8 +392,6 @@ application = webapp.WSGIApplication(
                                      [('/', MainPage),
                                       ('/bookmarklet',GetBookmarkletPage),
                                       ('/profile',ProfilePage),
-                                      ('/about',AboutPage),
-                                      ('/faq',FAQPage),
                                       ('/donate',Donate),
                                       ('/undo',UndoDonation),
                                       ('/delete',DeleteDonations),
