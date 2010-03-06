@@ -23,7 +23,7 @@ This is a admin page which can be used to assign a "Campaign" to a "DiddyBenefic
         <div style="padding: 2px 0 0 25px;">
         <form action="/admin/setbeneficiary" method="get">
           <input type="hidden" name="link" value="{{c.link}}" />
-          google_user: <input type="text" name="google_user" style="width:200px" value="" />
+          pledgie_id: <input type="text" name="pledgie_id" style="width:200px" value="" />
           <button class="sexybutton" type="submit" ><span><span><span class="useradd">Set</span></span></span></button>
         </form>
         <!--
@@ -34,7 +34,9 @@ This is a admin page which can be used to assign a "Campaign" to a "DiddyBenefic
   {% endfor %}
 </div>
 {% else %}
-There are no campaigns that do not have beneficiaries
+<div class="infoBox success">
+Nothing to do (<em>i.e. There are no campaigns that do not have beneficiaries</em>)
+</div>
 {% endif %}
 
 {% endblock %}

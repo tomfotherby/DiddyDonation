@@ -41,6 +41,7 @@ class DiddyMember(db.Model):
         return db.Model.put(self)
 
 # Beneficiaries table - link to Pledgie campaign
+# 6/Mar/10 - Currently, pledgie_id acts as the grouping field (but may need to change this)
 class DiddyBeneficiary(db.Model):
     google_user  = db.UserProperty(required=True)
     paypal_email = db.EmailProperty()
@@ -179,6 +180,7 @@ class CheckOutPage(BaseHandler):
         totvalue_list = {}
 
         # Group donations into campaigns and sum amount
+        # 6/Mar/10 - currently pledgie_id is used to group donations together
         for d in me.donations:
             b = d.campaign.beneficiary
 
@@ -203,7 +205,7 @@ class CheckOutPage(BaseHandler):
         for k in link_list:
             pId = str(k)
             outtext += '<div class="campaignCheckout clearAfter"><h4><span class="amount">'+str(totvalue_list[k])+'p</span> '+name_list[k]+'<br></h4>'
-            # TODO - Aggregate all donations to this Campaign and then allow user to add funds to their account
+            # TODO - Aggregate everyones donations for this Campaign and then allow user to add funds to their account
             #if totvalue_list[k] < min_donation:
             outtext += '<div style="float:left;margin: 0 0 0 30px"><span class="showClosed">Checkout closed</span> - amount too low (<span class="moreInfo"><a href="http://blog.diddydonation.com/faq#amounttoolow">learn more</a></span>)</div>'
             #else:
@@ -345,15 +347,20 @@ class DeleteDonations(BaseHandler):
 class SetBeneficiary(BaseHandler):
     def get(self):
         link        = self.request.get('link')
-        google_user = users.User(self.request.get('google_user'))
+        #google_user = users.User(self.request.get('google_user'))
+        pledgie_id  = int(self.request.get('pledgie_id'))
         campaign    = Campaign.gql("WHERE link = :1", link)
-        beneficiary = DiddyBeneficiary.gql("WHERE google_user = :1", google_user)
+        beneficiary = DiddyBeneficiary.gql("WHERE pledgie_id = :1", pledgie_id)
+        # Ensure only a single Campaign has this link
         if campaign.count() != 1:
-            logging.error('Found '+int(campaign.count())+' Campaigns with the same url in SetBeneficiary')
-            self.show_main_page('An error occured in SetBeneficiary (set logs).')
+            logging.error('Found '+str(campaign.count())+' Campaigns with the same url in SetBeneficiary')
+            self.show_main_page('An error occured in SetBeneficiary (see logs).')
+            return
+        # Ensure only a single Beneficiary has this pledgie_id
         if beneficiary.count() != 1:
-            logging.error('Found '+int(beneficiary.count())+' DiddyBeneficiarys with the same user in SetBeneficiary')
-            self.show_main_page('An error occured in SetBeneficiary (set logs).')
+            logging.error('Found '+str(beneficiary.count())+' DiddyBeneficiarys with the same pledgie_id in SetBeneficiary')
+            self.show_main_page('An error occured in SetBeneficiary (see logs).')
+            return
         c = campaign[0]
         c.beneficiary = beneficiary[0]
         c.put()
@@ -372,6 +379,35 @@ class CreateBeneficiary(BaseHandler):
         else:
             logging.error('DiddyBeneficiary already exists.')
         self.redirect('/admin/managebeneficiaries')
+
+# Edit a existing Beneficiary
+class EditBeneficiaryPage(BaseHandler):
+    def get(self):
+        db_key = self.request.get('key')
+        b = DiddyBeneficiary.get(db.Key(db_key))
+        self.render('editbeneficiary',{'b':b})
+    def post(self):
+        db_key = self.request.get('key')
+        b = DiddyBeneficiary.get(db.Key(db_key))
+        b.google_user  = users.User(self.request.get('google_user'))
+        b.paypal_email = self.request.get('paypal_email')
+        b.pledgie_id   = int(self.request.get('pledgie_id'))
+        b.pledgie_name = self.request.get('pledgie_name')
+        b.put()
+        self.redirect('/admin/managebeneficiaries')
+
+# Delete a existing Beneficiary
+class DeleteBeneficiary(BaseHandler):
+    def get(self):
+        db_key = self.request.get('key')
+        b = DiddyBeneficiary.get(db.Key(db_key))
+        # Blank all campaigns that have this beneficiary using a back-reference
+        for c in b.campaign_set:
+            c.beneficiary = None
+            c.put()
+        b.delete()
+        self.redirect('/admin/managebeneficiaries')
+
 
 # View current Beneficiaries and create new ones
 class ManageBeneficiaries(BaseHandler):
@@ -397,6 +433,8 @@ application = webapp.WSGIApplication(
                                       ('/delete',DeleteDonations),
                                       ('/checkout',CheckOutPage),
                                       ('/admin/setbeneficiary',SetBeneficiary),
+                                      ('/admin/deletebeneficiary',DeleteBeneficiary),
+                                      ('/admin/editbeneficiary',EditBeneficiaryPage),
                                       ('/admin/setbeneficiaries',SetBeneficiaries),
                                       ('/admin/managebeneficiaries',ManageBeneficiaries),
                                       ('/admin/createbeneficiary',CreateBeneficiary)],

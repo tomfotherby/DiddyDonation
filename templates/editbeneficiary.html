@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Diddydonation - Admin Section{% endblock %}
+
+{% block content %}
+
+<a href="/admin/managebeneficiaries">Manage Beneficiaries</a>
+
+<h1>Edit Beneficiary</h1>
+
+<form action="/admin/editbeneficiary" method="post">
+  <input type="hidden" name="key" value="{{b.key}}" />
+  google_user: <input type="text" name="google_user" style="width:200px" value="{{ b.google_user }}" /><br />
+  paypal_email: <input type="text" name="paypal_email" style="width:200px" value="{{ b.paypal_email }}" /><br />
+  pledgie_id: <input type="text" name="pledgie_id" style="width:50px" value="{{ b.pledgie_id }}" /><br />
+  pledgie_name: <input type="text" name="pledgie_name" style="width:200px" value="{{ b.pledgie_name }}" /><br />
+  <button class="sexybutton" type="submit" ><span><span><span class="useradd">Submit</span></span></span></button>
+</form>
+
+{% endblock %}

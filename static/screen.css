@@ -96,7 +96,7 @@ a:visited {color:#000;}
 .campaignCheckout h4 {margin-bottom: 5px}
 .campaignCheckout img {float:left;margin: 0 0 0 30px}
 .campaignLinks {height:42px;width:300px;overflow:auto;float:left;color:#CCC;margin-left:30px}
-.campaignLinks a {color:#CCC;font-size:0.9em;border-bottom:0}
+.campaignLinks a {color:#CCC;font-size:0.9em}
 
 /* Button Styling */
 

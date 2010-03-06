@@ -13,16 +13,29 @@ This is a admin page which can be used to create donation beneficiaries. Current
 Best would be if people would use BACS to add money to the Diddydonation back account and then Diddydonation could aggregate donations to the beneficiary.
 </p>
 
+
+<h3>Create new Beneficiary:</h3>
+
+<form action="/admin/createbeneficiary" method="post">
+  google_user: <input type="text" name="google_user" style="width:200px" value="" /><br />
+  paypal_email: <input type="text" name="paypal_email" style="width:200px" value="" /><br />
+  pledgie_id: <input type="text" name="pledgie_id" style="width:50px" value="" /><br />
+  pledgie_name: <input type="text" name="pledgie_name" style="width:200px" value="" /><br />
+  <button class="sexybutton" type="submit" ><span><span><span class="useradd">Create New Beneficiary</span></span></span></button>
+</form>
+
+<hr>
+
 <h2>Beneficiaries</h2>
 
 {% if beneficiaries|length %}
 <table>
     <tr>
-        <th>google_user</th><th>paypal_email</th><th>pledgie_id</th><th>pledgie_name</th>
+        <th>google_user</th><th>paypal_email</th><th>pledgie_id</th><th>pledgie_name</th><th>Actions</th>
     </tr>
   {% for b in beneficiaries %}
     <tr>
-        <td>{{ b.google_user}}</td><td>{{ b.paypal_email}}</td><td>{{ b.pledgie_id}}</td><td>{{ b.pledgie_name }}</td>
+        <td>{{ b.google_user}}</td><td>{{ b.paypal_email}}</td><td>{{ b.pledgie_id}}</td><td>{{ b.pledgie_name }}</td><td><a href="/admin/editbeneficiary?key={{ b.key}}">edit</a>, <a href="/admin/deletebeneficiary?key={{ b.key}}">delete</a></td>
     </tr>
   {% endfor %}
 </table>
@@ -40,13 +53,4 @@ No beneficiaries.
 
 {% endif %}
 
-<hr>
-<h3>Create new Beneficiary:</h3>
-<form action="/admin/createbeneficiary" method="post">
-  google_user: <input type="text" name="google_user" style="width:200px" value="" /><br />
-  paypal_email: <input type="text" name="paypal_email" style="width:200px" value="" /><br />
-  pledgie_id: <input type="text" name="pledgie_id" style="width:50px" value="" /><br />
-  pledgie_name: <input type="text" name="pledgie_name" style="width:200px" value="" /><br />
-  <button class="sexybutton" type="submit" ><span><span><span class="useradd">Create New Beneficiary</span></span></span></button>
-</form>
 {% endblock %}
