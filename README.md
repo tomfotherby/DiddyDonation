@@ -1,7 +1,7 @@
 About
 =====
 
-The Diddydonation website allows you to give a micro donation to any webpage that you find interesting, useful or fun.
+The Diddydonation website allows you to give a micro donation to any webpage that you find interesting, useful or fun. For more info, see the [About page](http://blog.bitvolution.com/about).
 
 License
 =======

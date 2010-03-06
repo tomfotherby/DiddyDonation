@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Diddydonation - Donation Info{% endblock %}
+
+{% block content %}
+
+    <h1><a href="{{ c.link }}">{{ c.link }}</a></h1>
+
+    <div style="margin-top:40px;">
+    Total Donations: <span class="amount">{{ c.count }}p</span>
+    <a href="/donate?link={{ c.link }}" title="pledge 1p to this webpage" class="sexybutton"><span><span><span class="addonep">Pledge 1p</span></span></span></a>
+    </div>
+
+{% endblock %}

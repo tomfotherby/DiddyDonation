@@ -340,6 +340,15 @@ class DeleteDonations(BaseHandler):
         c.put()
         self.redirect('/profile?delete='+link)
 
+# Page to see info about a donation. e.g. total amount donated
+class DonationInfo(BaseHandler):
+    def get(self):
+        link = self.request.get('link')
+        c = Campaign.gql("WHERE link = :1", link)
+        if c.count() != 1:
+            self.show_main_page('Campaign doesn\'t exist.')
+            return
+        self.render('donationinfo', {'c': c[0]})
 
 ############## Admin section ###################
 
@@ -429,6 +438,7 @@ application = webapp.WSGIApplication(
                                       ('/bookmarklet',GetBookmarkletPage),
                                       ('/profile',ProfilePage),
                                       ('/donate',Donate),
+                                      ('/donationinfo',DonationInfo),
                                       ('/undo',UndoDonation),
                                       ('/delete',DeleteDonations),
                                       ('/checkout',CheckOutPage),
