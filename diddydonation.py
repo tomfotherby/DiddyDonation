@@ -15,17 +15,19 @@
 import os
 import cgi
 import hashlib
-import Cookie
 import logging
 import datetime
 
 # To be able to use Google user accounts
 from google.appengine.api import users
 
+# This App uses Googles "Webapp" framework
 from google.appengine.ext import webapp
-from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+
+# Use the Google App Engine datastore
+from google.appengine.ext import db
 
 ############## Models ###################
 
@@ -37,6 +39,17 @@ class DiddyMember(db.Model):
         # When stored - create hash of user_id - constant even if user changes email address
         if self.hashedkey is None:
             self.hashedkey = hashlib.sha1(str(self.google_user.user_id())).hexdigest()
+            # check this hashedkey isn't already present in the DiddyMember table
+            #  otherwise means user has changed their email and is logging back in
+            #  This happen to me when I went from ...@googlemail.com to ...@gmail.com
+            userWithSameHash = DiddyMember.gql("WHERE hashedkey = :1", self.hashedkey)
+            if userWithSameHash.count() > 0:
+                # Instead of creating new user, update existing user with new email address
+                logging.info('In DiddyMember - Found '+str(userWithSameHash.count())+' People with hashedkey '+self.hashedkey)
+                u = userWithSameHash[0]
+                u.google_user = self.google_user;
+                u.put()
+                return u
         assert self.hashedkey
         return db.Model.put(self)
 
@@ -275,7 +288,7 @@ class Donate(BaseHandler):
             if donators.count() == 1:
                 me = donators[0]
             else:
-                logging.error('Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
+                logging.error('In Donate - Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
                 self.show_main_page('An error occured with your account.')
                 return
         else:
@@ -304,7 +317,7 @@ class UndoDonation(BaseHandler):
             if donators.count() == 1:
                 me = donators[0]
             else:
-                logging.error('Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
+                logging.error('In UndoDonation - Found '+str(donators.count())+' People with hashedkey '+self.request.get('k'))
                 self.show_main_page('An error occured with the undo.')
         else:
             if not users.get_current_user():
@@ -433,6 +446,7 @@ class SetBeneficiaries(BaseHandler):
         self.render('setbeneficiaries',{'ko_campaigns':ko_campaigns})
 
 
+# A WSGIApplication instance to route incoming requests to handlers based on the URL
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
                                       ('/bookmarklet',GetBookmarkletPage),
@@ -450,6 +464,7 @@ application = webapp.WSGIApplication(
                                       ('/admin/createbeneficiary',CreateBeneficiary)],
                                      debug=True)
 
+# A main routine that runs the WSGIApplication in App Engine's CGI environment
 def main():
     run_wsgi_app(application)
 
